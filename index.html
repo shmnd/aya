@@ -5,16 +5,92 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AYA</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* ===== Theme-matched animations (green / natural) ===== */
+    html { scroll-behavior: smooth; }
+
+    @keyframes fadeUp    { from { opacity: 0; transform: translateY(36px); } to { opacity: 1; transform: none; } }
+    @keyframes fadeIn    { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes zoomIn    { from { opacity: 0; transform: scale(.92); } to { opacity: 1; transform: scale(1); } }
+    @keyframes slideLeft { from { opacity: 0; transform: translateX(-48px); } to { opacity: 1; transform: none; } }
+    @keyframes slideRight{ from { opacity: 0; transform: translateX(48px); } to { opacity: 1; transform: none; } }
+
+    .reveal { opacity: 0; }
+    .reveal.in-view       { animation: fadeUp .8s cubic-bezier(.22,.61,.36,1) both; animation-delay: var(--d, 0s); }
+    .reveal-fade.in-view  { animation-name: fadeIn; }
+    .reveal-zoom.in-view  { animation-name: zoomIn; }
+    .reveal-left.in-view  { animation-name: slideLeft; }
+    .reveal-right.in-view { animation-name: slideRight; }
+
+    /* Hero */
+    @keyframes kenburns { from { transform: scale(1); } to { transform: scale(1.09); } }
+    .hero-img { animation: kenburns 18s ease-in-out infinite alternate; }
+
+    @keyframes floaty {
+      0%,100% { transform: translateY(0) rotate(0deg); }
+      50%     { transform: translateY(-12px) rotate(6deg); }
+    }
+    .leaf { position: absolute; font-size: 1.7rem; opacity: .55; pointer-events: none;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,.35)); animation: floaty 6s ease-in-out infinite; }
+
+    @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(9px); } }
+    .scroll-hint { animation: bob 1.8s ease-in-out infinite; }
+
+    /* Underline sweep on nav links */
+    .nav-link { position: relative; }
+    .nav-link::after { content: ""; position: absolute; left: 0; bottom: -4px; width: 100%; height: 2px;
+                       background: #16a34a; transform: scaleX(0); transform-origin: right;
+                       transition: transform .35s ease; }
+    .nav-link:hover::after { transform: scaleX(1); transform-origin: left; }
+
+    /* Section heading accent line */
+    .heading-accent { position: relative; display: inline-block; }
+    .heading-accent::after { content: ""; position: absolute; left: 50%; transform: translateX(-50%);
+                             bottom: -12px; height: 3px; width: 0; border-radius: 9999px;
+                             background: linear-gradient(90deg, #14532d, #4ade80);
+                             transition: width .8s ease .15s; }
+    .heading-accent.in-view::after { width: 84px; }
+
+    /* Card lift */
+    .lift { transition: transform .35s ease, box-shadow .35s ease; }
+    .lift:hover { transform: translateY(-8px); box-shadow: 0 18px 34px rgba(20,83,45,.16); }
+
+    /* Gallery hover */
+    #gallery img { transition: transform .5s ease, box-shadow .5s ease, opacity .3s ease; }
+    #gallery img:hover { transform: scale(1.04); box-shadow: 0 12px 26px rgba(20,83,45,.25); }
+
+    /* Process step pulse ring */
+    @keyframes ringPulse { 0% { box-shadow: 0 0 0 0 rgba(20,83,45,.35); } 70% { box-shadow: 0 0 0 14px rgba(20,83,45,0); } 100% { box-shadow: 0 0 0 0 rgba(20,83,45,0); } }
+    .step-badge { animation: ringPulse 2.6s ease-out infinite; }
+
+    /* Button shine */
+    .btn-shine { position: relative; overflow: hidden; }
+    .btn-shine::before { content: ""; position: absolute; top: 0; left: -80%; width: 55%; height: 100%;
+                         background: linear-gradient(120deg, transparent, rgba(255,255,255,.35), transparent);
+                         transform: skewX(-20deg); transition: left .6s ease; }
+    .btn-shine:hover::before { left: 130%; }
+
+    /* Lightbox open pop */
+    @keyframes lbPop { from { opacity: 0; transform: scale(.9); } to { opacity: 1; transform: scale(1); } }
+    #lightbox:not(.hidden) img { animation: lbPop .35s cubic-bezier(.22,.61,.36,1) both; }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+      html { scroll-behavior: auto; }
+      .reveal { opacity: 1; }
+    }
+  </style>
+  <noscript><style>.reveal { opacity: 1 !important; }</style></noscript>
 </head>
 <body class="bg-ivory text-gray-800 font-sans">
 
   <!-- Navbar -->
-  <header class="bg-[#f8f8eb] py-4 shadow-sm">
+  <header class="bg-[#f8f8eb]/95 backdrop-blur py-4 shadow-sm sticky top-0 z-40 transition-all duration-300">
     <div class="container mx-auto flex justify-between items-center px-4">
       <!-- Logo Section -->
-      <div class="flex items-center space-x-2">
-        <img src="images/logo/logo.svg" alt="logo" class="h-7 w-7">
-        <h1 class="text-xl font-semibold text-green-900">AYA ENTERPRISES</h1>
+      <div class="flex items-center space-x-2 group">
+        <img src="images/logo/logo.svg" alt="logo" class="h-12 w-12 transition-transform duration-500 group-hover:rotate-[360deg]">
+        <h1 class="text-xl font-semibold text-green-900 tracking-wide">AYA ENTERPRISES</h1>
       </div>
 
       <!-- Hamburger Icon (Mobile) -->
@@ -28,17 +104,17 @@
 
       <!-- Navigation Links -->
       <nav id="menu" class="hidden md:flex space-x-8 text-sm font-medium text-green-900">
-        <a href="#home" class="hover:text-green-600 block py-2">HOME</a>
-        <a href="#about" class="hover:text-green-600 block py-2">ABOUT</a>
-        <a href="#why-us" class="hover:text-green-600 block py-2">WHY US</a>
-        <a href="#products" class="hover:text-green-600 block py-2">PRODUCTS</a>
-        <a href="#gallery" class="hover:text-green-600 block py-2">GALLERY</a>
-        <a href="#get-in-touch" class="hover:text-green-600 block py-2">CONTACT</a>
+        <a href="#home" class="nav-link hover:text-green-600 block py-2">HOME</a>
+        <a href="#about" class="nav-link hover:text-green-600 block py-2">ABOUT</a>
+        <a href="#why-us" class="nav-link hover:text-green-600 block py-2">WHY US</a>
+        <a href="#products" class="nav-link hover:text-green-600 block py-2">PRODUCTS</a>
+        <a href="#gallery" class="nav-link hover:text-green-600 block py-2">GALLERY</a>
+        <a href="#get-in-touch" class="nav-link hover:text-green-600 block py-2">CONTACT</a>
       </nav>
     </div>
 
     <!-- Mobile Dropdown Menu -->
-    <div id="mobile-menu" class="md:hidden hidden bg-[#f8f8eb] border-t border-green-100">
+    <div id="mobile-menu" class="md:hidden hidden overflow-hidden bg-[#f8f8eb] border-t border-green-100">
       <a href="#home" class="block px-4 py-2 text-green-900">HOME</a>
       <a href="#about" class="block px-4 py-2 text-green-900">ABOUT</a>
       <a href="#why-us" class="block px-4 py-2 text-green-900">WHY US</a>
@@ -50,33 +126,59 @@
 
 
   <!-- Hero -->
-  <section id="home" class="relative">
-    <img src="images/banner/1abcd.jpg" alt="banner image" class="w-full h-[500px] object-cover brightness-75">
+  <section id="home" class="relative overflow-hidden">
+    <img src="images/cardamom-hills.jpg" alt="Misty cardamom hills of the Western Ghats"
+      loading="eager" fetchpriority="high" decoding="async"
+      class="hero-img w-full h-[500px] object-cover brightness-75">
+    <!-- Floating leaves -->
+    <span class="leaf" style="top:14%;left:8%;animation-delay:0s">🍃</span>
+    <span class="leaf" style="top:62%;left:14%;animation-delay:1.2s;font-size:1.3rem">🌿</span>
+    <span class="leaf" style="top:22%;right:10%;animation-delay:.6s">🍃</span>
+    <span class="leaf" style="top:70%;right:16%;animation-delay:2s;font-size:1.4rem">🌿</span>
+    <span class="leaf" style="top:40%;left:46%;animation-delay:1.6s;font-size:1.1rem;opacity:.35">🍃</span>
+
     <div class="absolute inset-0 flex flex-col justify-center items-center text-white text-center">
-      <h2 class="text-5xl font-bold">Pure Aroma,</h2>
-      <h2 class="text-5xl font-bold">Naturally Yours.</h2>
+      <h2 class="text-5xl font-bold drop-shadow-lg" style="animation:fadeUp .9s cubic-bezier(.22,.61,.36,1) both">Pure Aroma,</h2>
+      <h2 class="text-5xl font-bold drop-shadow-lg" style="animation:fadeUp .9s cubic-bezier(.22,.61,.36,1) both;animation-delay:.25s">Naturally Yours.</h2>
+      <p class="mt-4 text-lg text-green-100 max-w-xl px-4" style="animation:fadeIn 1.2s ease both;animation-delay:.6s">
+        Freshly harvested cardamom from the misty hills of Idukki, Kerala — straight to your doorstep.
+      </p>
+      <a href="#products" class="btn-shine mt-6 inline-block bg-green-700/90 hover:bg-green-600 text-white font-medium px-6 py-2.5 rounded-full transition-colors duration-300"
+         style="animation:zoomIn .8s ease both;animation-delay:.9s">Explore Products</a>
     </div>
+
+    <a href="#about" aria-label="Scroll down" class="scroll-hint absolute bottom-4 left-1/2 -translate-x-1/2 text-white/80 hover:text-white">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+      </svg>
+    </a>
   </section>
 
   <!-- About -->
   <section id="about" class="py-16 bg-[#faf8ef]">
     <div class="container mx-auto px-4 text-center md:text-left">
-      <h2 class="text-3xl font-semibold text-green-900 mb-4 text-center">About Us</h2>
-      <p class="max-w-3xl mx-auto text-gray-700">
+      <h2 class="reveal heading-accent text-3xl font-semibold text-green-900 mb-10 text-center">About Us</h2>
+      <div class="grid grid-cols-2 gap-4 max-w-3xl mx-auto mb-8">
+        <img src="images/blooming-field.jpg" alt="Blooming wildflowers beside the cardamom farm" loading="lazy" decoding="async"
+          class="reveal reveal-left rounded-lg shadow-sm w-full h-40 object-cover">
+        <img src="images/golden-meadow.jpg" alt="Golden meadow at dusk over the spice estate" loading="lazy" decoding="async"
+          class="reveal reveal-right rounded-lg shadow-sm w-full h-40 object-cover" style="--d:.15s">
+      </div>
+      <p class="reveal max-w-3xl mx-auto text-gray-700" style="--d:.2s">
         Rooted in the rich heritage of spice farming, our company has been delivering high-quality cardamom to customers worldwide. 
         We are committed to providing pure, fragrant, and sustainably sourced cardamom.
       </p>
-      <div class="grid grid-cols-3 gap-6 max-w-2xl mx-auto mt-10">
+      <div class="reveal grid grid-cols-3 gap-6 max-w-2xl mx-auto mt-10" style="--d:.3s">
         <div>
-          <p class="text-3xl font-bold text-green-900">20+</p>
+          <p class="count text-3xl font-bold text-green-900" data-target="20" data-suffix="+">0+</p>
           <p class="text-sm text-gray-600 mt-1">Years of Experience</p>
         </div>
         <div>
-          <p class="text-3xl font-bold text-green-900">10+</p>
+          <p class="count text-3xl font-bold text-green-900" data-target="10" data-suffix="+">0+</p>
           <p class="text-sm text-gray-600 mt-1">Countries Served</p>
         </div>
         <div>
-          <p class="text-3xl font-bold text-green-900">100%</p>
+          <p class="count text-3xl font-bold text-green-900" data-target="100" data-suffix="%">0%</p>
           <p class="text-sm text-gray-600 mt-1">Natural & Pure</p>
         </div>
       </div>
@@ -86,25 +188,25 @@
   <!-- Why Choose Us -->
   <section id="why-us" class="py-16 bg-white">
     <div class="container mx-auto px-4 text-center">
-      <h2 class="text-3xl font-semibold text-green-900 mb-10">Why Choose Us</h2>
+      <h2 class="reveal heading-accent text-3xl font-semibold text-green-900 mb-10">Why Choose Us</h2>
       <div class="grid md:grid-cols-4 gap-8">
-        <div class="p-6 bg-[#faf8ef] rounded-lg shadow-sm hover:shadow-md transition-shadow">
-          <div class="text-4xl mb-3">🌱</div>
+        <div class="lift reveal p-6 bg-[#faf8ef] rounded-lg shadow-sm" style="--d:0.00s">
+          <div class="text-4xl mb-3 transition-transform duration-300 hover:-translate-y-1 hover:scale-110 inline-block">🌱</div>
           <h3 class="text-lg font-semibold text-green-900 mb-2">100% Natural</h3>
           <p class="text-gray-700 text-sm">No additives, no artificial colors — just pure cardamom straight from the farm.</p>
         </div>
-        <div class="p-6 bg-[#faf8ef] rounded-lg shadow-sm hover:shadow-md transition-shadow">
-          <div class="text-4xl mb-3">🏔️</div>
+        <div class="lift reveal p-6 bg-[#faf8ef] rounded-lg shadow-sm" style="--d:0.12s">
+          <div class="text-4xl mb-3 transition-transform duration-300 hover:-translate-y-1 hover:scale-110 inline-block">🏔️</div>
           <h3 class="text-lg font-semibold text-green-900 mb-2">High-Altitude Grown</h3>
           <p class="text-gray-700 text-sm">Cultivated in the misty hills of Idukki, Kerala — the heart of India's spice gardens.</p>
         </div>
-        <div class="p-6 bg-[#faf8ef] rounded-lg shadow-sm hover:shadow-md transition-shadow">
-          <div class="text-4xl mb-3">✅</div>
+        <div class="lift reveal p-6 bg-[#faf8ef] rounded-lg shadow-sm" style="--d:0.24s">
+          <div class="text-4xl mb-3 transition-transform duration-300 hover:-translate-y-1 hover:scale-110 inline-block">✅</div>
           <h3 class="text-lg font-semibold text-green-900 mb-2">Quality Assured</h3>
           <p class="text-gray-700 text-sm">Rigorously sorted, graded, and tested to meet international export standards.</p>
         </div>
-        <div class="p-6 bg-[#faf8ef] rounded-lg shadow-sm hover:shadow-md transition-shadow">
-          <div class="text-4xl mb-3">🚚</div>
+        <div class="lift reveal p-6 bg-[#faf8ef] rounded-lg shadow-sm" style="--d:0.36s">
+          <div class="text-4xl mb-3 transition-transform duration-300 hover:-translate-y-1 hover:scale-110 inline-block">🚚</div>
           <h3 class="text-lg font-semibold text-green-900 mb-2">Global Delivery</h3>
           <p class="text-gray-700 text-sm">Reliable bulk exports with safe packaging, delivered on time to customers worldwide.</p>
         </div>
@@ -115,28 +217,28 @@
   <!-- Our Process -->
   <section id="process" class="py-16 bg-[#faf8ef]">
     <div class="container mx-auto px-4 text-center">
-      <h2 class="text-3xl font-semibold text-green-900 mb-4">From Farm to Your Door</h2>
+      <h2 class="reveal heading-accent text-3xl font-semibold text-green-900 mb-4">From Farm to Your Door</h2>
       <p class="max-w-2xl mx-auto text-gray-700 mb-10">
         Every pod we ship passes through a careful, traditional process that preserves its aroma, flavor, and quality.
       </p>
       <div class="grid md:grid-cols-4 gap-8">
-        <div class="relative">
-          <div class="mx-auto w-14 h-14 rounded-full bg-green-900 text-white flex items-center justify-center text-xl font-bold mb-4">1</div>
+        <div class="reveal lift relative" style="--d:0s">
+          <div class="step-badge mx-auto w-14 h-14 rounded-full bg-green-900 text-white flex items-center justify-center text-xl font-bold mb-4">1</div>
           <h3 class="text-lg font-semibold text-green-900 mb-2">Harvesting</h3>
           <p class="text-gray-700 text-sm">Hand-picked at peak maturity by experienced farmers in the Western Ghats.</p>
         </div>
-        <div class="relative">
-          <div class="mx-auto w-14 h-14 rounded-full bg-green-900 text-white flex items-center justify-center text-xl font-bold mb-4">2</div>
+        <div class="reveal lift relative" style="--d:0.15s">
+          <div class="step-badge mx-auto w-14 h-14 rounded-full bg-green-900 text-white flex items-center justify-center text-xl font-bold mb-4">2</div>
           <h3 class="text-lg font-semibold text-green-900 mb-2">Curing</h3>
           <p class="text-gray-700 text-sm">Slow-cured using traditional methods to lock in the essential oils and fragrance.</p>
         </div>
-        <div class="relative">
-          <div class="mx-auto w-14 h-14 rounded-full bg-green-900 text-white flex items-center justify-center text-xl font-bold mb-4">3</div>
+        <div class="reveal lift relative" style="--d:0.30s">
+          <div class="step-badge mx-auto w-14 h-14 rounded-full bg-green-900 text-white flex items-center justify-center text-xl font-bold mb-4">3</div>
           <h3 class="text-lg font-semibold text-green-900 mb-2">Grading</h3>
           <p class="text-gray-700 text-sm">Sorted by size, color, and quality to match each customer's specification.</p>
         </div>
-        <div class="relative">
-          <div class="mx-auto w-14 h-14 rounded-full bg-green-900 text-white flex items-center justify-center text-xl font-bold mb-4">4</div>
+        <div class="reveal lift relative" style="--d:0.45s">
+          <div class="step-badge mx-auto w-14 h-14 rounded-full bg-green-900 text-white flex items-center justify-center text-xl font-bold mb-4">4</div>
           <h3 class="text-lg font-semibold text-green-900 mb-2">Packaging & Export</h3>
           <p class="text-gray-700 text-sm">Vacuum-sealed and shipped worldwide, keeping freshness intact from farm to port.</p>
         </div>
@@ -147,32 +249,32 @@
   <!-- Testimonials -->
   <section id="testimonials" class="py-16 bg-white">
     <div class="container mx-auto px-4 text-center">
-      <h2 class="text-3xl font-semibold text-green-900 mb-10">What Our Customers Say</h2>
+      <h2 class="reveal heading-accent text-3xl font-semibold text-green-900 mb-10">What Our Customers Say</h2>
       <div class="grid md:grid-cols-3 gap-8">
-        <div class="bg-[#faf8ef] p-6 rounded-lg shadow-sm text-left">
+        <div class="lift reveal bg-[#faf8ef] p-6 rounded-lg shadow-sm text-left" style="--d:0.00s">
           <p class="text-gray-700 italic mb-4">"The aroma and quality of AYA's cardamom is unmatched. We've been importing from them for three years and have never had a single complaint."</p>
           <div class="flex items-center space-x-3">
-            <div class="w-10 h-10 rounded-full bg-green-900 text-white flex items-center justify-center font-semibold">RA</div>
+            <div class="w-10 h-10 rounded-full bg-green-900 text-white flex items-center justify-center font-semibold transition-transform duration-300 hover:scale-110">RA</div>
             <div>
               <p class="font-semibold text-green-900">Ravi Anand</p>
               <p class="text-sm text-gray-500">Spice Trader, Dubai</p>
             </div>
           </div>
         </div>
-        <div class="bg-[#faf8ef] p-6 rounded-lg shadow-sm text-left">
+        <div class="lift reveal bg-[#faf8ef] p-6 rounded-lg shadow-sm text-left" style="--d:0.15s">
           <p class="text-gray-700 italic mb-4">"Consistent grading, honest communication, and on-time delivery. A truly reliable partner for bulk cardamom procurement."</p>
           <div class="flex items-center space-x-3">
-            <div class="w-10 h-10 rounded-full bg-green-900 text-white flex items-center justify-center font-semibold">LM</div>
+            <div class="w-10 h-10 rounded-full bg-green-900 text-white flex items-center justify-center font-semibold transition-transform duration-300 hover:scale-110">LM</div>
             <div>
               <p class="font-semibold text-green-900">Lena Meyer</p>
               <p class="text-sm text-gray-500">Procurement Manager, Germany</p>
             </div>
           </div>
         </div>
-        <div class="bg-[#faf8ef] p-6 rounded-lg shadow-sm text-left">
+        <div class="lift reveal bg-[#faf8ef] p-6 rounded-lg shadow-sm text-left" style="--d:0.30s">
           <p class="text-gray-700 italic mb-4">"Their green cardamom pods are the freshest we've sourced in the region. You can tell they care about every step of the process."</p>
           <div class="flex items-center space-x-3">
-            <div class="w-10 h-10 rounded-full bg-green-900 text-white flex items-center justify-center font-semibold">SK</div>
+            <div class="w-10 h-10 rounded-full bg-green-900 text-white flex items-center justify-center font-semibold transition-transform duration-300 hover:scale-110">SK</div>
             <div>
               <p class="font-semibold text-green-900">Sanjay Kumar</p>
               <p class="text-sm text-gray-500">Restaurant Owner, Mumbai</p>
@@ -186,31 +288,31 @@
   <!-- Products -->
   <section id="products" class="py-16">
     <div class="container mx-auto px-4 text-center">
-      <h2 class="text-3xl font-semibold text-green-900 mb-10">Our Products</h2>
-      <div class="grid md:grid-cols-3 gap-8">
-        <div class="bg-white shadow-md rounded-lg overflow-hidden">
-          <img src="images/banner/3.jpg" class="w-full h-56 object-cover">
+      <h2 class="reveal heading-accent text-3xl font-semibold text-green-900 mb-10">Our Products</h2>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div class="lift reveal bg-white shadow-md rounded-lg overflow-hidden" style="--d:0.00s">
+          <img src="images/banner/3.jpg" alt="Whole green cardamom pods" loading="lazy" decoding="async" class="w-full h-56 object-cover transition-transform duration-700 hover:scale-110">
           <div class="p-6">
             <h3 class="text-xl font-semibold text-green-900">Whole Cardamom</h3>
             <p class="text-gray-700 mt-2">High-quality green cardamom pods</p>
           </div>
         </div>
-        <div class="bg-white shadow-md rounded-lg overflow-hidden">
-          <img src="images/product/p2.jpg" class="w-full h-56 object-cover">
+        <div class="lift reveal bg-white shadow-md rounded-lg overflow-hidden" style="--d:0.12s">
+          <img src="images/product/p2.jpg" alt="Ground cardamom spice" loading="lazy" decoding="async" class="w-full h-56 object-cover transition-transform duration-700 hover:scale-110">
           <div class="p-6">
             <h3 class="text-xl font-semibold text-green-900">Ground Cardamom</h3>
             <p class="text-gray-700 mt-2">Finely ground cardamom spice</p>
           </div>
         </div>
-        <div class="bg-white shadow-md rounded-lg overflow-hidden">
-          <img src="images/banner/d1.jpg" class="w-full h-56 object-cover">
+        <div class="lift reveal bg-white shadow-md rounded-lg overflow-hidden" style="--d:0.24s">
+          <img src="images/banner/d1.jpg" alt="Aromatic cardamom powder" loading="lazy" decoding="async" class="w-full h-56 object-cover transition-transform duration-700 hover:scale-110">
           <div class="p-6">
             <h3 class="text-xl font-semibold text-green-900">Cardamom Powder</h3>
             <p class="text-gray-700 mt-2">Aromatic ground cardamom powder for baking &amp; masalas</p>
           </div>
         </div>
-        <div class="bg-white shadow-md rounded-lg overflow-hidden">
-          <img src="images/product/p3.jpg" class="w-full h-56 object-cover">
+        <div class="lift reveal bg-white shadow-md rounded-lg overflow-hidden" style="--d:0.36s">
+          <img src="images/product/p3.jpg" alt="Bulk cardamom sacks for export" loading="lazy" decoding="async" class="w-full h-56 object-cover transition-transform duration-700 hover:scale-110">
           <div class="p-6">
             <h3 class="text-xl font-semibold text-green-900">Bulk Export</h3>
             <p class="text-gray-700 mt-2">Large quantities available for export</p>
@@ -223,17 +325,21 @@
   <!-- Gallery -->
   <section id="gallery" class="py-16 bg-[#faf8ef]">
     <div class="container mx-auto px-4 text-center">
-      <h2 class="text-3xl font-semibold text-green-900 mb-10">Gallery</h2>
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <img src="images/banner/g1.jpg" class="rounded-lg object-cover w-full h-48">
-        <img src="images/product/g2.jpg" class="rounded-lg object-cover w-full h-48">
-        <img src="images/product/g4.jpg" class="rounded-lg object-cover w-full h-48">
-        <img src="images/banner/g3.jpg" class="rounded-lg object-cover w-full h-48">
-        <img src="images/product/g5.jpg" class="rounded-lg object-cover w-full h-48">
-        <img src="images/banner/d2.jpg" class="rounded-lg object-cover w-full h-48">
-        <img src="images/banner/d3.jpg" class="rounded-lg object-cover w-full h-48">
-        <img src="images/banner/d4.jpg" class="rounded-lg object-cover w-full h-48">
-
+      <h2 class="reveal heading-accent text-3xl font-semibold text-green-900 mb-10">Gallery</h2>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 auto-rows-[190px]">
+        <img src="images/spice-garden.jpg" alt="Lush spice garden plantation" loading="lazy" decoding="async" class="reveal reveal-zoom rounded-lg object-cover w-full h-full md:col-span-2 hover:opacity-90 transition-opacity cursor-pointer" style="--d:0.00s">
+        <img src="images/banner/g1.jpg" alt="Cardamom harvest drying" loading="lazy" decoding="async" class="reveal reveal-zoom rounded-lg object-cover w-full h-full hover:opacity-90 transition-opacity cursor-pointer" style="--d:0.08s">
+        <img src="images/product/g2.jpg" alt="Green cardamom pods" loading="lazy" decoding="async" class="reveal reveal-zoom rounded-lg object-cover w-full h-full hover:opacity-90 transition-opacity cursor-pointer" style="--d:0.16s">
+        <img src="images/product/g4.jpg" alt="Cardamom in packaging" loading="lazy" decoding="async" class="reveal reveal-zoom rounded-lg object-cover w-full h-full hover:opacity-90 transition-opacity cursor-pointer" style="--d:0.24s">
+        <img src="images/banner/g3.jpg" alt="Spice plantation rows" loading="lazy" decoding="async" class="reveal reveal-zoom rounded-lg object-cover w-full h-full hover:opacity-90 transition-opacity cursor-pointer" style="--d:0.32s">
+        <img src="images/product/g5.jpg" alt="Close-up of cardamom pods" loading="lazy" decoding="async" class="reveal reveal-zoom rounded-lg object-cover w-full h-full hover:opacity-90 transition-opacity cursor-pointer" style="--d:0.40s">
+        <img src="images/banner/d2.jpg" alt="Sorting cardamom by grade" loading="lazy" decoding="async" class="reveal reveal-zoom rounded-lg object-cover w-full h-full hover:opacity-90 transition-opacity cursor-pointer" style="--d:0.48s">
+        <img src="images/banner/d3.jpg" alt="Curing the cardamom yield" loading="lazy" decoding="async" class="reveal reveal-zoom rounded-lg object-cover w-full h-full hover:opacity-90 transition-opacity cursor-pointer" style="--d:0.56s">
+        <img src="images/banner/d4.jpg" alt="Packed batches ready for export" loading="lazy" decoding="async" class="reveal reveal-zoom rounded-lg object-cover w-full h-full hover:opacity-90 transition-opacity cursor-pointer" style="--d:0.00s">
+        <img src="images/misty-valley.jpg" alt="Misty valley of the Western Ghats" loading="lazy" decoding="async" class="reveal reveal-zoom rounded-lg object-cover w-full h-full hover:opacity-90 transition-opacity cursor-pointer" style="--d:0.08s">
+        <img src="images/mountain-range.jpg" alt="Mountain ranges above the spice farms" loading="lazy" decoding="async" class="reveal reveal-zoom rounded-lg object-cover w-full h-full md:col-span-2 hover:opacity-90 transition-opacity cursor-pointer" style="--d:0.16s">
+        <img src="images/lake-mountains.jpg" alt="Still lake reflecting green hills" loading="lazy" decoding="async" class="reveal reveal-zoom rounded-lg object-cover w-full h-full hover:opacity-90 transition-opacity cursor-pointer" style="--d:0.24s">
+        <img src="images/forest-stream.jpg" alt="Forest stream winding through the plantation" loading="lazy" decoding="async" class="reveal reveal-zoom rounded-lg object-cover w-full h-full md:col-span-2 hover:opacity-90 transition-opacity cursor-pointer" style="--d:0.32s">
       </div>
     </div>
   </section>
@@ -241,9 +347,11 @@
   <!-- Contact -->
   <section id="get-in-touch" class="py-16 bg-white">
     <div class="container mx-auto px-4">
-      <h2 class="text-3xl font-semibold text-green-900 mb-10 text-center">Get In Touch</h2>
+      <h2 class="reveal heading-accent text-3xl font-semibold text-green-900 mb-10 text-center">Get In Touch</h2>
       <div class="grid md:grid-cols-2 gap-10 max-w-4xl mx-auto">
-        <div class="text-left">
+        <div class="reveal reveal-left text-left">
+          <img src="images/banner/1abcd.jpg" alt="Cardamom farm at sunrise" loading="lazy" decoding="async"
+            class="rounded-lg shadow-md w-full h-64 object-cover mb-6">
           <p class="text-gray-700 mb-6">
             Interested in bulk orders or have questions about our products? Reach out to us — we usually respond within 24 hours.
           </p>
@@ -262,7 +370,7 @@
             </li>
           </ul>
         </div>
-        <form class="space-y-4 text-left" onsubmit="event.preventDefault(); alert('Thank you! We will get back to you soon.'); this.reset();">
+        <form class="reveal reveal-right space-y-4 text-left" style="--d:.15s" onsubmit="event.preventDefault(); alert('Thank you! We will get back to you soon.'); this.reset();">
           <input type="text" placeholder="Your Name" required
             class="w-full px-4 py-2 border border-green-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
           <input type="email" placeholder="Your Email" required
@@ -272,7 +380,7 @@
           <textarea rows="4" placeholder="Your Message" required
             class="w-full px-4 py-2 border border-green-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"></textarea>
           <button type="submit"
-            class="bg-green-900 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors font-medium">
+            class="btn-shine bg-green-900 text-white px-6 py-2 rounded-lg hover:bg-green-700 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 font-medium">
             Send Message
           </button>
         </form>
@@ -323,13 +431,23 @@
   const menuBtn = document.getElementById('menu-btn');
   const mobileMenu = document.getElementById('mobile-menu');
 
+  // Animate mobile menu open/close
+  function openMobileMenu() {
+    mobileMenu.classList.remove('hidden');
+    mobileMenu.style.maxHeight = '0';
+    mobileMenu.style.transition = 'max-height .35s ease';
+    requestAnimationFrame(() => { mobileMenu.style.maxHeight = mobileMenu.scrollHeight + 'px'; });
+  }
+  function closeMobileMenu() {
+    mobileMenu.style.maxHeight = '0';
+    setTimeout(() => { mobileMenu.classList.add('hidden'); }, 300);
+  }
   menuBtn.addEventListener('click', () => {
-    mobileMenu.classList.toggle('hidden');
+    mobileMenu.classList.contains('hidden') ? openMobileMenu() : closeMobileMenu();
   });
 
-  // Close mobile menu when a link is clicked
   mobileMenu.querySelectorAll('a').forEach(link => {
-    link.addEventListener('click', () => mobileMenu.classList.add('hidden'));
+    link.addEventListener('click', () => closeMobileMenu());
   });
 
   // Smooth scrolling for anchor links
@@ -342,4 +460,79 @@
       }
     });
   });
+
+  // Gallery lightbox — click any gallery image to view it full-size
+  const lightbox = document.createElement('div');
+  lightbox.id = 'lightbox';
+  lightbox.className = 'fixed inset-0 z-50 hidden items-center justify-center bg-black/80 p-4 cursor-zoom-out';
+  lightbox.innerHTML = '<img src="" alt="" class="max-w-full max-h-[90vh] rounded-lg shadow-2xl">';
+  document.body.appendChild(lightbox);
+
+  document.querySelectorAll('#gallery img').forEach(img => {
+    img.classList.add('cursor-pointer');
+    img.addEventListener('click', () => {
+      lightbox.querySelector('img').src = img.src;
+      lightbox.querySelector('img').alt = img.alt;
+      lightbox.classList.remove('hidden');
+      lightbox.classList.add('flex');
+    });
+  });
+  lightbox.addEventListener('click', () => {
+    lightbox.classList.add('hidden');
+    lightbox.classList.remove('flex');
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      lightbox.classList.add('hidden');
+      lightbox.classList.remove('flex');
+    }
+  });
+</script>
+
+<script>
+  // ===== Scroll-triggered reveal animations =====
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('in-view');
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.reveal, .heading-accent').forEach(el => io.observe(el));
+
+  // Fallback: browsers without IntersectionObserver just show all content
+  if (!('IntersectionObserver' in window)) {
+    document.querySelectorAll('.reveal, .heading-accent').forEach(el => el.classList.add('in-view'));
+  }
+
+  // ===== Animated counters (About stats) =====
+  const cio = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const el = entry.target;
+      cio.unobserve(el);
+      const target = parseInt(el.dataset.target, 10);
+      const suffix = el.dataset.suffix || '';
+      const dur = 1400, t0 = performance.now();
+      (function tick(now) {
+        const p = Math.min((now - t0) / dur, 1);
+        const eased = 1 - Math.pow(1 - p, 3);
+        el.textContent = Math.round(target * eased) + suffix;
+        if (p < 1) requestAnimationFrame(tick);
+      })(t0);
+    });
+  }, { threshold: 0.6 });
+  document.querySelectorAll('.count').forEach(el => cio.observe(el));
+
+  // ===== Navbar shrink on scroll =====
+  const header = document.querySelector('header');
+  let lastY = 0;
+  window.addEventListener('scroll', () => {
+    const y = window.scrollY;
+    if (y > 60) { header.classList.add('py-2', 'shadow-md'); header.classList.remove('py-4'); }
+    else        { header.classList.add('py-4'); header.classList.remove('py-2', 'shadow-md'); }
+    lastY = y;
+  }, { passive: true });
 </script>
